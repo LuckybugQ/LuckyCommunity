@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Lucky社区</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="社区">
+  <meta name="description" content="Lucky社区是以SpringBoot和LayUI开发的个人社区">
+  <link rel="icon" href="https://zzq-community-header.oss-cn-chengdu.aliyuncs.com/31ee644b54724b7c9df58e30ef14b616.png"/>
+  <link rel="stylesheet" th:href="@{/res/layui/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/res/css/global.css}">
+</head>
+<body>
+
+<div class="fly-header layui-bg-black" th:fragment="header">
+  <div class="layui-container">
+    <a class="fly-logo" href="/">
+      <img src="/img/logo2.png" alt="lucky">
+    </a>
+    <ul class="layui-nav fly-nav layui-hide-xs">
+      <li class="layui-nav-item layui-this">
+        <a href="/"><i class="iconfont icon-jiaoliu"></i>社区</a>
+      </li>
+<!--      <li class="layui-nav-item">-->
+<!--        <a href="http://github.com/luckybugq/community" target="_blank"><i style="font-size: 24px" class="layui-icon">&#xe635;</i>源码</a>-->
+<!--      </li>-->
+
+      <li class="layui-nav-item">
+        <a href="http://github.com/LuckybugQ/LuckyCommunity" target="_blank"><i class="layui-icon">&#xe635;</i>源码</a>
+      </li>
+      <li class="layui-nav-item">
+        <a href="http://my.luckybugq.cn/" target="_blank"><i class="layui-icon">&#xe60b;</i>关于</a>
+      </li>
+    </ul>
+    
+    <ul class="layui-nav fly-nav-user">
+      
+      <!-- 未登入的状态 -->
+<!--      <li class="layui-nav-item">-->
+<!--        <a class="iconfont icon-touxiang layui-hide-xs" href="user/login.html"></a>-->
+<!--      </li>-->
+      <li class="layui-nav-item" th:if="${loginUser==null}">
+        <a th:href="@{/login}">登录</a>
+      </li>
+      <li class="layui-nav-item" th:if="${loginUser==null}">
+        <a th:href="@{/register}">注册</a>
+      </li>
+      <li class="layui-nav-item layui-hide-xs" th:if="${loginUser==null}">
+        <a style="font-size: 25px" th:href="${githubUrl}"
+           onclick="layer.msg('正在通过Github登录', {icon:16, shade: 0.1, time:0})" title="Github登录" class="iconfont2 icon-github"></a>
+      </li>
+      
+      <!-- 登入后的状态 -->
+
+      <li class="layui-nav-item" th:if="${loginUser!=null}">
+        <a class="fly-nav-avatar" href="javascript:;">
+          <cite class="layui-hide-xs" th:utext="${loginUser.username}">贤心</cite>
+          <span th:if="${allUnreadCount>0}" class="layui-badge-dot"></span>
+<!--          <i class="iconfont icon-renzheng layui-hide-xs" title="认证信息：layui 作者"></i>-->
+<!--          <i class="layui-badge fly-badge-vip layui-hide-xs">VIP3</i>-->
+          <img th:src="${loginUser.headerUrl}">
+
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a th:href="@{|/user/profile/${loginUser.id}|}"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
+          <dd><a th:href="@{/user/info}"><i class="layui-icon" style="font-size: 20px; margin-left: 3px;">&#xe770;</i>用户中心</a></dd>
+          <dd><a th:href="@{/user/setting}"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
+          <dd><a th:href="@{/user/message}"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息
+              <span th:if="${allUnreadCount>0}" class="layui-badge-dot"></span></a>
+              </dd>
+
+          <hr style="margin: 5px 0;">
+          <dd><a th:href="@{/logout}" style="text-align: center;">退出登录</a></dd>
+        </dl>
+      </li>
+
+    </ul>
+  </div>
+</div>
+
+<div class="fly-panel fly-column" th:fragment="sub-header">
+  <div class="layui-container">
+    <ul class="layui-clear">
+        <li th:class="${type==-1?'layui-this':''}"><a href="/">首页</a></li>
+        <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><span class="fly-mid"></span></li>
+        <li th:class="${type==0?'layui-this':''}"><a th:href="@{/index(type=0)}">提问</a></li>
+        <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><span class="fly-mid"></span></li>
+        <li th:class="${type==2?'layui-this':''}"><a th:href="@{/index(type=2)}">分享</a></li>
+        <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><span class="fly-mid"></span></li>
+        <li th:class="${type==3?'layui-this':''}"><a th:href="@{/index(type=3)}">讨论</a></li>
+
+
+
+    </ul> 
+    
+    <div class="fly-column-right">
+        <form class="layui-form" style="padding-top: 5px" method="get" th:action="@{/search}">
+            <div class="layui-input-block">
+                <input maxlength="20" aria-label="Search" name="keyword" th:value="${keyword}" lay-verify="required" autocomplete="off" class="layui-input" style="padding-right: 80px;">
+                <button onclick="layer.msg('正在搜索', {icon:16, shade: 0.1, time:0})" style="border:0; background: transparent; position: absolute;top: 0; right: 0px; padding-left:10px; padding-right:10px ;cursor: pointer;" type="submit" class="layui-btn">
+                    <i class="layui-icon" style="font-size: 20px; color: #5FB878;">&#xe615;</i>
+                </button>
+            </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<div class="layui-container">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md8">
+        <div class="fly-panel" th:fragment="top-panel">
+            <div class="fly-panel-title fly-filter">
+                <a>置顶</a>
+            </div>
+            <ul class="fly-list">
+                <li th:each="map:${topDiscussPosts}">
+                    <a th:href="@{|/user/profile/${map.user.id}|}" class="fly-avatar">
+                        <img th:src="${map.user.headerUrl}" alt="用户头像">
+                    </a>
+                    <h2>
+                        <a class="layui-badge">公告</a>
+                        <a th:href="@{|/discuss/detail/${map.post.id}|}" th:utext="${map.post.title}">备战春招</a>
+                    </h2>
+                    <div class="fly-list-info">
+                        <a th:href="@{|/user/profile/${map.user.id}|}" link>
+                            <cite th:utext="${map.user.username}">贤心</cite>
+                            <i th:if="${map.user.type==2}" class="iconfont icon-renzheng" title="版主"></i>
+                            <i th:if="${map.user.type==1}" class="layui-badge fly-badge-vip">管理员</i>
+                        </a>
+                        <span th:text="${#dates.format(map.post.createTime,'yyyy-MM-dd HH:mm:ss')}">发帖时间</span>
+                        <!--<span class="layui-badge fly-badge-accept layui-hide-xs">已结</span>-->
+                        <span class="fly-list-nums">
+                            <i class="layui-icon" title="赞" style="font-size: 12px;">&#xe6c6;</i> <span th:text="${map.likeCount}">11</span>
+                            <i class="layui-icon" title="回复" style="font-size: 12px;">&#xe63a;</i> <span th:text="${map.post.commentCount}">11</span>
+                        </span>
+                    </div>
+                    <div class="fly-list-badge">
+                        <span th:if="${map.post.type==1}" class="layui-badge layui-bg-black">置顶</span>
+                        <span th:if="${map.post.status==1}" class="layui-badge layui-bg-red">精帖</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+
+      <div class="fly-panel" th:fragment="post-panel" style="margin-bottom: 0;">
+        
+        <div class="fly-panel-title fly-filter">
+          <a th:href="|@{/index(type=${type},filter=0,orderMode=${orderMode})}|" th:class="${filter==0?'layui-this':''}">综合</a>
+          <span class="fly-mid"></span>
+                 <a th:if="${type<=0}" th:href="|@{/index(type=${type},filter=1,orderMode=${orderMode})}|" th:class="${filter==1?'layui-this':''}">未结</a>
+                 <span th:if="${type<=0}" class="fly-mid"></span>
+                 <a th:if="${type<=0}" th:href="|@{/index(type=${type},filter=2,orderMode=${orderMode})}|" th:class="${filter==2?'layui-this':''}">已结</a>
+                 <span th:if="${type<=0}" class="fly-mid"></span>
+          <a th:href="|@{/index(type=${type},filter=3,orderMode=${orderMode})}|" th:class="${filter==3?'layui-this':''}">精华</a>
+          <span class="fly-filter-right layui-hide-xs">
+            <a th:href="|@{/index(type=${type},filter=${filter},orderMode=0)}|" th:class="${orderMode==0?'layui-this':''}">按最新</a>
+            <span class="fly-mid"></span>
+            <a th:href="|@{/index(type=${type},filter=${filter},orderMode=1)}|" th:class="${orderMode==1?'layui-this':''}">按热议</a>
+          </span>
+        </div>
+
+        <ul class="fly-list" th:fragment="post-list">
+          <li th:each="map:${discussPosts}" th:if="${map.post.type!=1}">
+            <a th:href="@{|/user/profile/${map.user.id}|}" class="fly-avatar">
+              <img th:src="${map.user.headerUrl}" alt="用户头像">
+            </a>
+            <h2>
+              <a th:if="${map.post.type==0}" class="layui-badge">提问</a>
+              <a th:if="${map.post.type==1}" class="layui-badge">公告</a>
+              <a th:if="${map.post.type==2}" class="layui-badge">分享</a>
+              <a th:if="${map.post.type==3}" class="layui-badge">讨论</a>
+              <a th:href="@{|/discuss/detail/${map.post.id}|}" th:utext="${map.post.title}">备战春招</a>
+            </h2>
+            <div class="fly-list-info">
+              <a th:href="@{|/user/profile/${map.user.id}|}" link>
+                <cite th:utext="${map.user.username}">贤心</cite>
+                  <i th:if="${map.user.type==2}" class="iconfont icon-renzheng" title="版主"></i>
+                  <i th:if="${map.user.type==1}" class="layui-badge fly-badge-vip">管理员</i>
+              </a>
+              <span th:text="${#dates.format(map.post.createTime,'yyyy-MM-dd HH:mm:ss')}">发帖时间</span>
+              
+              <span th:if="${map.post.type==0}" class="fly-list-kiss layui-hide-xs" title="悬赏钻石"><i class="layui-icon" style="font-size: 12px">&#xe735;</i>
+                  <i th:utext="${map.post.reward}">60</i>
+              </span>
+              <span th:if="${map.post.type==0 and map.post.acceptId>0}" class="layui-badge fly-badge-accept layui-hide-xs">已结</span>
+              <span class="fly-list-nums"> 
+                  <i class="layui-icon" title="赞" style="font-size: 12px;">&#xe6c6;</i> <span th:text="${map.likeCount}">11</span>
+                  <i class="layui-icon" title="回复" style="font-size: 12px;">&#xe63a;</i> <span th:text="${map.post.commentCount}">11</span>
+              </span>
+            </div>
+            <div class="fly-list-badge">
+                  <span th:if="${map.post.type==1}" class="layui-badge layui-bg-black">置顶</span>
+                  <span th:if="${map.post.status==1}" class="layui-badge layui-bg-red">精帖</span>
+            </div>
+          </li>
+
+        </ul>
+        
+        <div th:if="${page.rows==0}" class="fly-none">没有相关数据</div>
+
+          <div th:if="${page.rows>0}" id="pageDemo"></div>
+
+      </div>
+    </div>
+
+
+    <div class="layui-col-md4" th:fragment="right">
+        <div class="fly-panel">
+            <h3 class="fly-panel-title">为您推荐</h3>
+            <ul class="fly-panel-main fly-list-static">
+                <li th:each="post:${recommendPosts}">
+                    <a th:href="@{|/discuss/detail/${post.id}|}" th:utext="${post.title}">备战春招</a>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="fly-panel fly-signin">
+            <div class="fly-panel-title">
+                签到
+                <i class="fly-mid"></i>
+                <a href="javascript:;" class="fly-link" id="LAY_signinHelp">说明</a>
+
+                <span class="fly-signin-days">已连续签到<cite th:text="${signedDays}">16</cite>天</span>
+            </div>
+
+            <div class="fly-panel-main fly-signin-main">
+                <button th:if="${!hasSigned}" class="layui-btn layui-btn-danger" id="LAY_signin">今日签到</button>
+                <span th:if="${!hasSigned}">可获得<cite th:text="${signedReward}">5</cite>钻石</span>
+
+                <!-- 已签到状态 -->
+
+                <button th:if="${hasSigned}"class="layui-btn layui-btn-disabled">今日已签到</button>
+                <span th:if="${hasSigned}">获得了<cite th:text="${signedReward}">5</cite>钻石</span>
+
+            </div>
+        </div>
+
+        <div class="fly-panel fly-rank fly-rank-reply" id="LAY_replyRank">
+            <h3 class="fly-panel-title">技术大咖</h3>
+            <dl>
+                <!--<i class="layui-icon fly-loading">&#xe63d;</i>-->
+                <dd th:each="map:${hotUsers}">
+                    <a th:href="@{|/user/profile/${map.user.id}|}">
+                        <img th:src="${map.user.headerUrl}"><cite th:utext="${map.user.username}">贤心</cite>
+                        <i>获得<span th:utext="${map.user.likeCount}"></span>次赞</i>
+                    </a>
+                </dd>
+            </dl>
+        </div>
+
+
+      <div class="fly-panel">
+        <div class="fly-panel-title">
+          友情推荐
+        </div>
+        <div class="fly-panel-main">
+          <a href="https://github.com/CyC2018/CS-Notes" target="_blank" class="fly-zanzhu" style="background-color: #393D49;">CS-Notes</a>
+          <a href="https://github.com/Snailclimb/JavaGuide" target="_blank" class="fly-zanzhu" style="background-color: #393D49;">Java-Guide</a>
+        </div>
+      </div>
+      
+      <div class="fly-panel fly-link">
+        <h3 class="fly-panel-title">参考链接</h3>
+        <dl class="fly-panel-main">
+          <dd><a href="http://www.github.com/LuckybugQ" target="_blank">Github</a><dd>
+          <dd><a href="https://spring.io/projects/spring-boot" target="_blank">SpringBoot</a><dd>
+          <dd><a href="http://www.layui.com/" target="_blank">LayUI</a><dd>
+            <dd><a href="http://kafka.apache.org/" target="_blank">Kafka</a><dd>
+            <dd><a href="https://www.elastic.co/cn/" target="_blank">Elasticsearch</a><dd>
+            <dd><a href="http://www.quartz-scheduler.org/" target="_blank">Quartz</a><dd>
+            <dd><a href="https://www.thymeleaf.org/" target="_blank">Thymeleaf</a><dd>
+            <dd><a href="https://github.com/ben-manes/caffeine" target="_blank">Caffeine</a><dd>
+            <dd><a href="https://github.com/penggle/kaptcha" target="_blank">Kaptcha</a><dd>
+          <dd><a href="mailto:luckybugq@163.com?subject=%E7%94%B3%E8%AF%B7Fly%E7%A4%BE%E5%8C%BA%E5%8F%8B%E9%93%BE" class="fly-link">联系我</a><dd>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="fly-footer" th:fragment="footer">
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <p>
+  <span id="busuanzi_container_site_pv">本站总访问量: <span id="busuanzi_value_site_pv" style="color:#01AAED"></span> 次</span>
+  </p>
+  <p>
+      <a>日活跃用户: <span style="color:#01AAED" th:text="${DAU}"><span></a>
+       |
+      <a>独立访客: <span style="color:#01AAED" th:text="${UV}"><span></a>
+  </p>
+  <p>
+      <a href="http://www.luckybugq.cn/" target="_blank">Lucky社区</a> 2020 &copy;
+      <a href="http://my.luckybugq.cn/" target="_blank">luckybugq 出品</a>
+  </p>
+  <p>
+    <a href="http://www.beian.miit.gov.cn/" target="_blank">苏ICP备20004934号-2</a>
+  </p>
+</div>
+
+<script th:src="@{/res/layui/layui.js}"></script>
+<script>
+    layui.use(['layer', 'laypage', 'element'], function(){
+        var layer = layui.layer
+            ,laypage = layui.laypage
+        //测试数据
+        var rows = [[${page.rows}]];
+        var orderMode = [[${orderMode}]];
+        var filter = [[${filter}]];
+        var type = [[${type}]];
+        var current = [[${page.current}]];
+        var limit = [[${page.limit}]];
+        //调用分页
+        laypage.render({
+            elem: 'pageDemo'
+            ,count: rows
+            ,curr:current
+            ,limit:limit
+            ,jump: function(obj , first){
+                //首次不执行
+                if(!first){
+                    //do something
+                    var pageSize=obj.limit;
+                    var pageNum=obj.curr;
+                    window.location.href="/index?type="+type+"&filter="+filter+"&orderMode="+orderMode+"&current="+pageNum;//跳转链接
+                }
+
+            }
+        });
+    });
+</script>
+
+
+<script>
+layui.cache.page = '';
+layui.cache.user = {
+  username: '游客'
+  ,uid: -1
+  ,avatar: '../../res/images/avatar/00.jpg'
+  ,experience: 83
+  ,sex: '男'
+};
+layui.config({
+  version: "3.0.0"
+  ,base: '/res/mods/'
+}).extend({
+  fly: 'index'
+}).use('fly');
+</script>
+
+
+</body>
+</html>

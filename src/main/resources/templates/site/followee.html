@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>Lucky社区-关注列表</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="keywords" content="社区">
+	<meta name="description" content="Lucky社区是以SpringBoot和LayUI开发的个人社区">
+	<link rel="icon" href="https://zzq-community-header.oss-cn-chengdu.aliyuncs.com/31ee644b54724b7c9df58e30ef14b616.png"/>
+	<link rel="stylesheet" th:href="@{/res/layui/css/layui.css}">
+	<link rel="stylesheet" th:href="@{/res/css/global.css}">
+</head>
+<div>
+
+<div class="fly-header layui-bg-black" th:replace="index::header">
+	<div class="layui-container">
+		<a class="fly-logo" href="/">
+			<img src="../../res/images/logo.png" alt="layui">
+		</a>
+		<ul class="layui-nav fly-nav layui-hide-xs">
+			<li class="layui-nav-item layui-this">
+				<a href="/"><i class="iconfont icon-jiaoliu"></i>交流</a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="../case/case.html"><i class="iconfont icon-iconmingxinganli"></i>案例</a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="http://www.layui.com/" target="_blank"><i class="iconfont icon-ui"></i>框架</a>
+			</li>
+		</ul>
+
+		<ul class="layui-nav fly-nav-user">
+
+			<!-- 未登入的状态 -->
+			<li class="layui-nav-item">
+				<a class="iconfont icon-touxiang layui-hide-xs" href="user/login.html"></a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="user/login.html">登入</a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="user/reg.html">注册</a>
+			</li>
+			<li class="layui-nav-item layui-hide-xs">
+				<a href="/app/qq/" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" title="QQ登入" class="iconfont icon-qq"></a>
+			</li>
+			<li class="layui-nav-item layui-hide-xs">
+				<a href="/app/weibo/" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" title="微博登入" class="iconfont icon-weibo"></a>
+			</li>
+
+			<!-- 登入后的状态 -->
+			<!--
+            <li class="layui-nav-item">
+              <a class="fly-nav-avatar" href="javascript:;">
+                <cite class="layui-hide-xs">贤心</cite>
+                <i class="iconfont icon-renzheng layui-hide-xs" title="认证信息：layui 作者"></i>
+                <i class="layui-badge fly-badge-vip layui-hide-xs">VIP3</i>
+                <img src="https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+              </a>
+              <dl class="layui-nav-child">
+                <dd><a href="../user/set.html"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
+                <dd><a href="../user/message.html"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a></dd>
+                <dd><a href="../user/home.html"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
+                <hr style="margin: 5px 0;">
+                <dd><a href="" style="text-align: center;">退出</a></dd>
+              </dl>
+            </li>
+            -->
+		</ul>
+	</div>
+</div>
+
+	<div class="fly-home fly-panel" style="
+	background-image: url(https://zzq-community-header.oss-cn-chengdu.aliyuncs.com/1e01f9775c004740bc6983894be86a7e.jpg);
+	background-size: cover;
+	background-repeat: no-repeat;">
+
+		<img th:src="${user.headerUrl}" th:alt="${user.username}">
+		<!--	<i class="iconfont icon-renzheng" title="Fly社区认证"></i>-->
+		<h1 style="color:white">
+			<i th:utext="${user.username}"></i>
+			<i th:if="${user.gender==0}" class="iconfont icon-nan"></i>
+			<i th:if="${user.gender==1}" class="iconfont icon-nv"></i>
+			<i th:if="${user.type==2}" class="layui-badge layui-bg-orange">版主</i>
+			<i th:if="${user.type==1}" class="layui-badge">管理员</i>
+			<i th:if="${isNewUser}" class="layui-badge layui-bg-orange">新用户</i>
+			<i th:if="${!isNewUser and likeCount>20}" class="layui-badge layui-bg-orange">大咖</i>
+			<!--		<i class="layui-badge fly-badge-vip">VIP3</i>-->
+			<!--
+            <span style="color:#c00;">（管理员）</span>
+            <span style="color:#5FB878;">（社区之光）</span>
+            <span>（该号已被封）</span>
+            -->
+		</h1>
+
+		<p style="padding: 10px 0; color:lightgrey">
+			<span> 关注了 <a style="color: #FF7200;"th:href="@{|/followees/${user.id}|}" th:text="${followeeCount}">5</a> 人 </span>
+			<span>|</span>
+			<span> 关注者 <a style="color: #FF7200;" th:href="@{|/followers/${user.id}|}" th:text="${followerCount}">123</a> 人 </span>
+			<span>|</span>
+			<span> 获得了 <i style="color: #FF7200;" th:text="${likeCount}">87</i> 个赞 </span>
+		</p>
+
+
+		<p class="fly-home-info" >
+			<i class="layui-icon" style="color:lightgrey" title="钻石">&#xe735;</i><span th:utext="|${user.reward} 钻石|" style="color: #FF7200;">66666 钻石</span>
+			<i class="iconfont icon-shijian" style="color:lightgrey"></i><span style="color:lightgrey" th:text="|${#dates.format(user.createTime,'yyyy-MM-dd')}加入|"></span>
+			<i class="layui-icon" style="color:lightgrey">&#xe715;</i><span th:utext="|来自${user.city}|" style="color:lightgrey">来自成都</span>
+		</p>
+
+		<p th:utext="${user.signature}" class="fly-home-sign" style="color:lightgrey">人生仿若一场修行</p>
+
+		<div th:if="${loginUser!=null and loginUser.id!=user.id}" class="fly-sns">
+			<input type="hidden" id="entityId" th:value="${user.id}">
+			<button th:text="${hasFollowed?'取消关注':'关注TA'}"
+					th:class="|follow-btn layui-btn fly-imActive ${hasFollowed?'layui-btn-primary':'layui-btn-warm'}|"
+			>关注</button>
+
+			<a href="javascript:;" class="follow-btn layui-btn layui-btn-normal fly-imActive" data-type="chat">私信</a>
+		</div>
+
+	</div>
+
+<div class="fly-main" style="overflow: hidden;">
+
+	<div class="fly-tab-border fly-case-tab">
+    <span>
+      <a th:href="@{|/followees/${user.id}|}" class="tab-this"><i class="text-info" th:utext="${user.username}"></i> 关注的人</a>
+      <a th:href="@{|/followers/${user.id}|}">关注 <i class="text-info" th:utext="${user.username}"></i> 的人</a>
+    </span>
+		<a th:href="@{|/user/profile/${user.id}|}" style="position: absolute;right: 0px;">
+			<button class="layui-btn">返回个人主页</button>
+		</a>
+	</div>
+
+	<ul class="fly-case-list">
+		<li data-id="123" th:each="map:${users}">
+			<a class="fly-case-img" th:href="@{|/user/profile/${map.user.id}|}">
+				<img th:src="${map.user.headerUrl}" alt="Fly社区">
+				<cite class="layui-btn layui-btn-primary layui-btn-small">看看TA的主页</cite>
+			</a>
+			<h2><a th:href="@{|/user/profile/${map.user.id}|}" th:utext="${map.user.username}">Fly社区</a></h2>
+			<div class="fly-case-info">
+				<p class="layui-elip" style="font-size: 12px;">
+					<span th:text="${#dates.format(map.followTime,'yyyy-MM-dd HH:mm:ss')}" style="color: #666;">贤心</span>
+				</p>
+
+				<p>获得<a th:utext="${map.likeCount}" class="fly-case-nums fly-case-active" style=" padding:0 5px; color: #01AAED;">666</a>个赞</p>
+
+				<input type="hidden" id="entityId" th:value="${map.user.id}">
+				<button th:if="${loginUser!=null and loginUser.id!=map.user.id}"
+						th:text="${map.hasFollowed?'取消关注':'关注TA'}"
+						th:class="|follow-btn layui-btn fly-imActive ${map.hasFollowed?'layui-btn-primary':'layui-btn-warm'}|"
+				>关注</button>
+
+			</div>
+		</li>
+
+	</ul>
+
+	<blockquote th:if="${page.rows==0}" class="layui-elem-quote layui-quote-nm">TA暂时没有关注任何人哦！</blockquote>
+
+	<div th:if="${page.rows>0}" id="pageDemo"></div>
+
+</div>
+
+
+<div class="fly-footer" th:replace="index::footer">
+	<p><a href="http://www.luckybugq.xyz/" target="_blank">Lucky社区</a> 2020 &copy;
+		<a href="http://www.github.com/LuckybugQ" target="_blank">luckybugq 出品</a></p>
+	<p>
+		<a target="_blank">苏ICP备20004934号-1</a>
+	</p>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+
+<script th:src="@{/res/layui/layui.js}"></script>
+<script th:src="@{/js/profile.js}"></script>
+<script>
+	layui.cache.page = 'jie';
+	layui.cache.user = {
+		username: '游客'
+		,uid: -1
+		,avatar: '../../res/images/avatar/00.jpg'
+		,experience: 83
+		,sex: '男'
+	};
+	layui.config({
+		version: "3.0.0"
+		,base: '/res/mods/'
+	}).extend({
+		fly: 'index'
+	}).use(['fly', 'face'], function(){
+		var $ = layui.$
+				,fly = layui.fly;
+		//如果你是采用模版自带的编辑器，你需要开启以下语句来解析。
+
+		$('.home-dacontent').each(function(){
+			var othis = $(this), html = othis.html();
+			othis.html(fly.content(html));
+		});
+
+	});
+</script>
+<script>
+	layui.use(['layer', 'laypage', 'element'], function(){
+		var layer = layui.layer
+				,laypage = layui.laypage
+		//测试数据
+		var rows = [[${page.rows}]];
+		var current = [[${page.current}]];
+		var limit = [[${page.limit}]];
+		//调用分页
+		laypage.render({
+			elem: 'pageDemo'
+			,count: rows
+			,curr:current
+			,limit:limit
+			,jump: function(obj , first){
+				//首次不执行
+				if(!first){
+					//do something
+					var pageSize=obj.limit;
+					var pageNum=obj.curr;
+					var path = window.location.pathname;
+					window.location.href=path+"?current="+pageNum;//跳转链接
+				}
+
+			}
+		});
+	});
+</script>
+</body>
+</html>

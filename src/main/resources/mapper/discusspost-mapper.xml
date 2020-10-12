@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uestc.community.dao.DiscussPostMapper">
+
+    <sql id="selectFields">
+        id, user_id, title, content, type, status, create_time, comment_count, score,accept_id ,reward, update_time
+    </sql>
+
+    <sql id="insertFields">
+        user_id, title, content, type, status, create_time, comment_count, score,accept_id ,reward, update_time
+    </sql>
+
+    <select id="selectDiscussPosts" resultType="DiscussPost">
+        select <include refid="selectFields"></include>
+        from discuss_post
+        where status != 2
+        <if test="userId>0">
+            and user_id = #{userId}
+        </if>
+        <if test="orderMode==0">
+            order by create_time desc
+        </if>
+        <if test="orderMode==1">
+            order by score desc, create_time desc
+        </if>
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="selectDiscussPostsByType" resultType="DiscussPost">
+        select <include refid="selectFields"></include>
+        from discuss_post
+        where status != 2
+        <if test="type==-1">
+            and type != 1
+        </if>
+        <if test="type>=0">
+            and type = #{type}
+        </if>
+        <if test="filter==1">
+            and type = 0
+            and accept_id = 0
+        </if>
+        <if test="filter==2">
+            and accept_id > 0
+        </if>
+        <if test="filter==3">
+            and status = 1
+        </if>
+        <if test="type!=1 and orderMode==0">
+            order by update_time desc
+        </if>
+        <if test="type!=1 and orderMode==1">
+            order by score desc, update_time desc
+        </if>
+        <if test="type==1">
+            order by create_time desc
+        </if>
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="selectDiscussPostRows" resultType="int">
+        select count(id)
+        from discuss_post
+        where status != 2
+        <if test="userId>0">
+            and user_id = #{userId}
+        </if>
+    </select>
+
+    <select id="selectDiscussPostRowsByType" resultType="int">
+        select count(id)
+        from discuss_post
+        where status != 2
+        <if test="type==-1">
+            and type != 1
+        </if>
+        <if test="type>=0">
+            and type = #{type}
+        </if>
+        <if test="filter==1">
+            and type = 0
+            and accept_id = 0
+        </if>
+        <if test="filter==2">
+            and accept_id > 0
+        </if>
+        <if test="filter==3">
+            and status = 1
+        </if>
+    </select>
+
+    <insert id="insertDiscussPost" parameterType="DiscussPost" keyProperty="id">
+        insert into discuss_post(<include refid="insertFields"></include>)
+        values(#{userId},#{title},#{content},#{type},#{status},#{createTime},#{commentCount},#{score},#{acceptId},#{reward},#{updateTime})
+    </insert>
+
+    <select id="selectDiscussPostById" resultType="DiscussPost">
+        select <include refid="selectFields"></include>
+        from discuss_post
+        where id = #{id}
+    </select>
+
+    <update id="updateCommentCount">
+        update discuss_post set comment_count = #{commentCount} where id = #{id}
+    </update>
+
+    <update id="updateType">
+        update discuss_post set type = #{type} where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update discuss_post set status = #{status} where id = #{id}
+    </update>
+
+    <update id="updateScore">
+        update discuss_post set score = #{score} where id = #{id}
+    </update>
+
+    <update id="updateTitle">
+        update discuss_post set title = #{title} where id = #{id}
+    </update>
+
+    <update id="updateContent">
+        update discuss_post set content = #{content} where id = #{id}
+    </update>
+
+    <update id="updateAcceptId">
+        update discuss_post set accept_id = #{acceptId} where id = #{id}
+    </update>
+
+    <update id="updateUpdateTime">
+        update discuss_post set update_time = #{updateTime} where id = #{id}
+    </update>
+
+    <select id="selectDiscussPostsByKeyword" resultType="DiscussPost">
+        select <include refid="selectFields"></include>
+        from discuss_post
+        where status != 2
+            and type != 1
+            and title like #{keyword}
+            order by update_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="selectDiscussPostRowsByKeyword" resultType="int">
+        select count(id)
+        from discuss_post
+        where status != 2
+          and type != 1
+          and title like #{keyword}
+    </select>
+
+</mapper>

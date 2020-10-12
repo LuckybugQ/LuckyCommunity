@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>Lucky社区-操作结果</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="keywords" content="社区">
+	<meta name="description" content="Lucky社区是以SpringBoot和LayUI开发的个人社区">
+	<link rel="icon" href="https://zzq-community-header.oss-cn-chengdu.aliyuncs.com/31ee644b54724b7c9df58e30ef14b616.png"/>
+	<link rel="stylesheet" th:href="@{/res/layui/css/layui.css}">
+	<link rel="stylesheet" th:href="@{/res/css/global.css}">
+</head>
+<body>
+
+
+		<!-- 头部 -->
+		<header class="fly-header layui-bg-black" th:replace="index::header">
+		</header>
+
+		<!-- 内容 -->
+		<div class="layui-container fly-marginTop">
+			<div class="fly-panel">
+				<div class="fly-none">
+					<h3><i class="iconfont icon-tishilian"></i></h3>
+					<p th:text="${msg}">提示消息</p>
+					<p>
+						系统会在 <span id="seconds" class="text-danger">8</span> 秒后自动跳转,
+						您也可以点此 <a id="target" th:href="@{${target}}" class="text-primary">链接</a>, 手动跳转!
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- 尾部 -->
+		<footer class="fly-footer" th:replace="index::footer">
+		</footer>
+
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+	<script>
+		$(function(){
+			setInterval(function(){
+				var seconds = $("#seconds").text();
+				$("#seconds").text(--seconds);
+				if(seconds == 0) {
+					location.href = $("#target").attr("href");
+				}
+			}, 1000);
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="utf-8">
+  <title>Lucky社区-帖子详情</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="keywords" content="社区">
+  <meta name="description" content="Lucky社区是以SpringBoot和LayUI开发的个人社区">
+  <link rel="icon" href="https://zzq-community-header.oss-cn-chengdu.aliyuncs.com/31ee644b54724b7c9df58e30ef14b616.png"/>
+  <link rel="stylesheet" th:href="@{/res/layui/css/layui.css}">
+  <link rel="stylesheet" th:href="@{/res/css/global.css}">
+
+</head>
+<body>
+
+<div class="fly-header layui-bg-black" th:replace="index::header">
+  <div class="layui-container">
+    <a class="fly-logo" href="/">
+      <img src="../../res/images/logo.png" alt="layui">
+    </a>
+    <ul class="layui-nav fly-nav layui-hide-xs">
+      <li class="layui-nav-item layui-this">
+        <a href="/"><i class="iconfont icon-jiaoliu"></i>交流</a>
+      </li>
+      <li class="layui-nav-item">
+        <a href="../case/case.html"><i class="iconfont icon-iconmingxinganli"></i>案例</a>
+      </li>
+      <li class="layui-nav-item">
+        <a href="http://www.layui.com/" target="_blank"><i class="iconfont icon-ui"></i>框架</a>
+      </li>
+    </ul>
+    
+    <ul class="layui-nav fly-nav-user">
+      
+      <!-- 未登入的状态 -->
+<!--      <li class="layui-nav-item">-->
+<!--        <a class="iconfont icon-touxiang layui-hide-xs" href="user/login.html"></a>-->
+<!--      </li>-->
+      <li class="layui-nav-item">
+        <a th:href="@{/login}">登录</a>
+      </li>
+      <li class="layui-nav-item">
+        <a th:href="@{/register}">注册</a>
+      </li>
+      <li class="layui-nav-item layui-hide-xs">
+        <a href="/app/qq/" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" title="QQ登入" class="iconfont icon-qq"></a>
+      </li>
+      <li class="layui-nav-item layui-hide-xs">
+        <a href="/app/weibo/" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" title="微博登入" class="iconfont icon-weibo"></a>
+      </li>
+      
+      <!-- 登入后的状态 -->
+      <!--
+      <li class="layui-nav-item">
+        <a class="fly-nav-avatar" href="javascript:;">
+          <cite class="layui-hide-xs">贤心</cite>
+          <i class="iconfont icon-renzheng layui-hide-xs" title="认证信息：layui 作者"></i>
+          <i class="layui-badge fly-badge-vip layui-hide-xs">VIP3</i>
+          <img src="https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="../user/set.html"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
+          <dd><a href="../user/message.html"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a></dd>
+          <dd><a href="../user/home.html"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
+          <hr style="margin: 5px 0;">
+          <dd><a href="" style="text-align: center;">退出</a></dd>
+        </dl>
+      </li>
+      -->
+    </ul>
+  </div>
+</div>
+
+<div class="fly-panel fly-column" th:replace="index::sub-header">
+  <div class="layui-container">
+    <ul class="layui-clear">
+      <li class="layui-hide-xs"><a href="/">首页</a></li> 
+      <li class="layui-this"><a href="">提问</a></li> 
+      <li><a href="">分享<span class="layui-badge-dot"></span></a></li> 
+      <li><a href="">讨论</a></li> 
+      <li><a href="">建议</a></li> 
+      <li><a href="">公告</a></li> 
+      <li><a href="">动态</a></li> 
+      <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><span class="fly-mid"></span></li> 
+      
+      <!-- 用户登入后显示 -->
+      <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><a href="../user/index.html">我发表的贴</a></li> 
+      <li class="layui-hide-xs layui-hide-sm layui-show-md-inline-block"><a href="../user/index.html#collection">我收藏的贴</a></li> 
+    </ul> 
+    
+    <div class="fly-column-right">
+        <form class="layui-form" style="padding-top: 5px" method="get" th:action="@{/search}">
+            <div class="layui-input-block">
+                <input aria-label="Search" name="keyword" th:value="${keyword}" lay-verify="required" autocomplete="off" class="layui-input" style="padding-right: 80px;">
+                <button style="border:0; background: transparent; position: absolute;top: 0; right: 0px; padding-left:10px; padding-right:10px ;cursor: pointer;" type="submit" class="layui-btn">
+                    <i class="layui-icon" style="font-size: 20px; color: #5FB878;">&#xe615;</i>
+                </button>
+            </div>
+        </form>
+
+<!--      <span class="fly-search"><i class="layui-icon"></i></span> -->
+<!--      <a href="add.html" class="layui-btn">发表新帖</a> -->
+    </div>
+
+
+    <div class="layui-hide-sm layui-show-xs-block" style="margin-top: -10px; padding-bottom: 10px; text-align: center;"> 
+      <a href="add.html" class="layui-btn">发表新帖</a> 
+    </div> 
+  </div>
+</div>
+
+<div id="container" class="layui-container">
+  <div class="layui-row layui-col-space15">
+
+      <div class="layui-col-md8 content detail">
+          <div class="fly-panel detail-box">
+              <input type="hidden" id="postId" th:value="${post.id}">
+              <h1 th:utext="${post.title}">Fly Template v3.0，基于 layui 的极简社区页面模版</h1>
+              <div class="fly-detail-info">
+                  <!-- <span class="layui-badge">审核中</span> -->
+                  <span th:if="${post.type==0}" class="layui-badge layui-bg-green fly-detail-column">提问</span>
+                  <span th:if="${post.type==1}" class="layui-badge layui-bg-green fly-detail-column">公告</span>
+                  <span th:if="${post.type==2}" class="layui-badge layui-bg-green fly-detail-column">分享</span>
+                  <span th:if="${post.type==3}" class="layui-badge layui-bg-green fly-detail-column">讨论</span>
+
+                  <span th:if="${post.type==0 and post.acceptId==0}" class="layui-badge" style="background-color: #999;">未结</span>
+                  <span th:if="${post.type==0 and post.acceptId>0}" class="layui-badge" style="background-color: #5FB878;">已结</span>
+
+                  <span th:if="${post.type==1}" class="layui-badge layui-bg-black">置顶</span>
+                  <span th:if="${post.status==1}" class="layui-badge layui-bg-red">精帖</span>
+
+                  <div class="fly-admin-box" data-id="123">
+                      <span class="layui-btn layui-btn-xs jie-admin" type="del" th:if="${loginUser!=null and (loginUser.id==user.id || loginUser.type==1)}">删除</span>
+
+                      <span th:if="${post.type!=1}" id="topBtn" class="layui-btn layui-btn-xs jie-admin" field="stick" rank="1" sec:authorize="hasAnyAuthority('moderator','admin')">置顶</span>
+                      <span th:if="${post.type==1}" id="topBtnC" class="layui-btn layui-btn-xs jie-admin" field="stick" rank="0" sec:authorize="hasAnyAuthority('moderator','admin')" style="background-color:#ccc;">取消置顶</span>
+
+                      <span th:if="${post.status!=1}" id="wonderfulBtn" class="layui-btn layui-btn-xs jie-admin" field="status" rank="1" sec:authorize="hasAnyAuthority('moderator','admin')">加精</span>
+                      <span th:if="${post.status==1}" id="wonderfulBtnC" class="layui-btn layui-btn-xs jie-admin" field="status" rank="0" sec:authorize="hasAnyAuthority('moderator','admin')" style="background-color:#ccc;">取消加精</span>
+                  </div>
+                  <span class="fly-list-nums">
+
+            <a href="javascript:;" th:onclick="|favorite(this,1,${post.id});|">
+                <b th:class="|layui-icon ${favoriteStatus==1?'liked':''}|" title="收藏" style="font-size: 16px">&#xe600;</b>
+            </a>
+
+            <span>|</span>
+
+            <a href="javascript:;" th:onclick="|like(this,1,${post.id},${post.userId},${post.id});|">
+                <b th:class="|layui-icon ${likeStatus==1?'liked':''}|" title="赞" style="font-size: 16px">&#xe6c6;</b>
+                <span th:class="${likeStatus==1?'liked':''}" th:text="${likeCount}" style="font-size: 16px">11</span>
+            </a>
+
+            <span>|</span>
+            <a href="#comment">
+                <b class="layui-icon" title="回复" style="font-size: 16px">&#xe63a;</b>
+                <span th:text="${post.commentCount}" style="font-size: 16px">11</span>
+            </a>
+
+
+          </span>
+              </div>
+              <div class="detail-about">
+                  <a class="fly-avatar" th:href="@{|/user/profile/${user.id}|}">
+                      <img th:src="${user.headerUrl}" th:alt="${user.username}">
+                  </a>
+                  <div class="fly-detail-user">
+                      <a th:href="@{|/user/profile/${user.id}|}" class="fly-link">
+                          <cite th:utext="${user.username}">贤心</cite>
+                          <i th:if="${user.type==2}" class="iconfont icon-renzheng" title="版主"></i>
+                          <i th:if="${user.type==1}" class="layui-badge fly-badge-vip">管理员</i>
+                      </a>
+                      <span th:text="${#dates.format(post.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</span>
+                  </div>
+                  <div class="detail-hits" id="LAY_jieAdmin" data-id="123">
+                      <span th:if="${post.type==0}" style="padding-right: 10px; color: #FF7200">悬赏：<i th:utext="${post.reward}">60</i>钻石</span>
+                      <span th:if="${post.type!=0}" th:utext="${user.signature}" style="padding-right: 10px; color: #009688">签名</span>
+                      <span th:if="${loginUser!=null and (loginUser.id==user.id || loginUser.type==1)}" class="layui-btn layui-btn-xs jie-admin" type="edit"><a th:href="@{|/discuss/edit/${post.id}|}">编辑此贴</a></span>
+                  </div>
+              </div>
+              <div class="detail-body photos" th:utext="${post.content}">
+
+              </div>
+          </div>
+          <div th:if="${post.type==0 and post.acceptId!=0 and bestComment!=null}" class="fly-panel detail-box" id="bestflyReply">
+              <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+                  <legend>最佳答案</legend>
+              </fieldset>
+              <ul class="jieda" id="bestjieda">
+                  <li class="jieda-daan">
+                      <a name="item-1111111111"></a>
+                      <input type="hidden" class="commentId" th:value="${bestComment.comment.id}">
+                      <div class="detail-about detail-about-reply">
+                          <a class="fly-avatar" th:href="@{|/user/profile/${bestComment.user.id}|}">
+                              <img th:src="${bestComment.user.headerUrl}" alt=" ">
+                          </a>
+                          <div class="fly-detail-user">
+                              <a th:href="@{|/user/profile/${bestComment.user.id}|}" class="fly-link">
+                                  <cite th:utext="${bestComment.user.username}">贤心</cite>
+                                  <i th:if="${bestComment.user.type==2}" class="iconfont icon-renzheng" title="版主"></i>
+                                  <i th:if="${bestComment.user.type==1}" class="layui-badge fly-badge-vip">管理员</i>
+                              </a>
+
+                              <span th:if="${bestComment.user.id==user.id}">(楼主)</span>
+
+                          </div>
+
+                          <div class="detail-hits">
+                              <span th:text="${#dates.format(bestComment.comment.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</span>
+                          </div>
+
+                          <i class="iconfont icon-caina" title="最佳答案"></i>
+                      </div>
+
+                      <div class="detail-body jieda-body photos" th:utext="${bestComment.comment.content}">
+
+                      </div>
+
+                      <div class="jieda-reply">
+
+              <span href="javascript:;" th:onclick="|like(this,2,${bestComment.comment.id},${bestComment.comment.userId},${post.id});|">
+                    <b th:class="|layui-icon ${bestComment.likeStatus==1?'liked':''}|" title="赞" style="font-size: 16px">&#xe6c6;</b>
+                    <span th:class="${bestComment.likeStatus==1?'liked':''}" th:text="${bestComment.likeCount}" style="font-size: 16px">123</span>
+              </span>
+                          <span href="javascript:;" th:onclick="|replyList(this,${bestComment.comment.id});|">
+                <b class="layui-icon" title="回复" style="font-size: 16px">&#xe63a;</b>
+                <span th:text="${bestComment.replyCount}" style="font-size: 16px">100</span>
+              </span>
+                      </div>
+
+                      <!-- 回复列表 -->
+                      <div th:hidden="${bestComment.replyCount>5?'true':'false'}" th:id="|replylist-${bestComment.comment.id}|">
+                          <fieldset  class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                              <ul class="fly-list" style="background-color: #eeeeee; padding-left: 20px; padding-right: 20px;">
+
+                                  <li th:each="rvo:${bestComment.replys}" class="reply-li">
+                                      <div>
+										<span th:if="${rvo.target==null}">
+											<a th:href="@{|/user/profile/${rvo.user.id}|}"><b th:text="${rvo.user.username}">寒江雪</b></a>
+                                            <span th:if="${rvo.user.id==user.id}">(楼主)</span>
+                                            <span th:if="${rvo.user.id!=user.id and rvo.user.id==bestComment.user.id}">(层主)</span>:
+										</span>
+                                          <span th:if="${rvo.target!=null}">
+
+											<a th:href="@{|/user/profile/${rvo.user.id}|}"><b  th:text="${rvo.user.username}">Sissi</b></a>
+                                              <span th:if="${rvo.user.id==user.id}">(楼主)</span>
+                                              <span th:if="${rvo.user.id!=user.id and rvo.user.id==bestComment.user.id}">(层主)</span> 回复
+											<a th:href="@{|/user/profile/${rvo.target.id}|}"><b  th:text="${rvo.target.username}">寒江雪</b></a>
+                                              <span th:if="${rvo.target.id==user.id}">(楼主)</span>
+                                              <span th:if="${rvo.target.id!=user.id and rvo.target.id==bestComment.user.id}">(层主)</span>:
+										</span>
+                                          <span th:utext="${rvo.reply.content}">这个是直播时间哈，觉得晚的话可以直接看之前的完整录播的~</span>
+                                      </div>
+                                      <div class="fly-list-info">
+                                          <span th:text="${#dates.format(rvo.reply.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</span>
+
+                                          <span class="fly-list-nums">
+
+                                          <a th:if="${loginUser!=null and (loginUser.id==bestComment.user.id || loginUser.id==user.id || loginUser.type==1)}" href="javascript:;" th:onclick="|deleteReply(this,${rvo.reply.id});|" style="font-size: 12px">删除</a>
+                                          <a href="javascript:;" th:onclick="|like(this,2,${rvo.reply.id},${rvo.reply.userId},${post.id});|">
+                                              <i th:class="${rvo.likeStatus==1?'liked':''}" th:text="${rvo.likeStatus==1?'已赞':'赞'}" style="font-size: 12px">赞</i>
+                                              <span th:class="${rvo.likeStatus==1?'liked':''}" th:text="${rvo.likeCount}" style="font-size: 12px">1</span>
+                                          </a>
+                                          <span style="font-size: 12px">|</span>
+                                          <input type="hidden" th:id="|username-${rvo.reply.id}|" th:value="${rvo.user.username}">
+                                          <a href="javascript:;" th:onclick="|replyTarget(this,${bestComment.comment.id},${rvo.reply.id});|" style="font-size: 12px">回复</a>
+                                    </span>
+
+                                      </div>
+                                  </li>
+
+                                  <!-- 回复输入框 -->
+                                  <li>
+                                      <form class="layui-form" method="post" th:action="@{|/comment/add/${post.id}|}">
+                                          <input type="hidden" name="entityType" value="2">
+                                          <input type="hidden" name="entityId" th:value="${bestComment.comment.id}">
+                                          <div class="layui-input-block" style="margin-left: 0px">
+                                              <a name="comment"></a>
+                                              <input th:id="|reply-${bestComment.comment.id}|" name="content" lay-verify="required" autocomplete="off" class="layui-input">
+                                              <button style="position: absolute;top: 0;right: 0px;
+    cursor: pointer;" lay-submit lay-filter="*" class="layui-btn">回复</button>
+                                          </div>
+                                      </form>
+                                  </li>
+                              </ul>
+                          </fieldset>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+          <div class="fly-panel detail-box" id="flyReply">
+              <fieldset class="layui-elem-field layui-field-title" style="text-align: center;">
+                  <legend>回帖</legend>
+              </fieldset>
+
+              <ul class="jieda" id="jieda">
+                  <li class="jieda-daan" th:each="cvo:${comments}" th:if="${cvo.comment.id!=post.acceptId}">
+                      <a name="item-1111111111"></a>
+                      <input type="hidden" class="commentId" th:value="${cvo.comment.id}">
+                      <div class="detail-about detail-about-reply">
+                          <a class="fly-avatar" th:href="@{|/user/profile/${cvo.user.id}|}">
+                              <img th:src="${cvo.user.headerUrl}" alt=" ">
+                          </a>
+                          <div class="fly-detail-user">
+                              <a th:href="@{|/user/profile/${cvo.user.id}|}" class="fly-link">
+                                  <cite th:utext="${cvo.user.username}">贤心</cite>
+                                  <i th:if="${cvo.user.type==2}" class="iconfont icon-renzheng" title="版主"></i>
+                                  <i th:if="${cvo.user.type==1}" class="layui-badge fly-badge-vip">管理员</i>
+                              </a>
+
+                              <span th:if="${cvo.user.id==user.id}">(楼主)</span>
+
+                          </div>
+
+                          <div class="detail-hits">
+                              <span th:text="${#dates.format(cvo.comment.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</span>
+                          </div>
+
+                          <i th:if="${cvo.comment.id==post.acceptId}" class="iconfont icon-caina" title="最佳答案"></i>
+                      </div>
+
+                      <div class="detail-body jieda-body photos" th:utext="${cvo.comment.content}">
+
+                      </div>
+
+                      <div class="jieda-reply">
+
+              <span href="javascript:;" th:onclick="|like(this,2,${cvo.comment.id},${cvo.comment.userId},${post.id});|">
+                    <b th:class="|layui-icon ${cvo.likeStatus==1?'liked':''}|" title="赞" style="font-size: 16px">&#xe6c6;</b>
+                    <span th:class="${cvo.likeStatus==1?'liked':''}" th:text="${cvo.likeCount}" style="font-size: 16px">123</span>
+              </span>
+              <span href="javascript:;" th:onclick="|replyList(this,${cvo.comment.id});|">
+                <b class="layui-icon" title="回复" style="font-size: 16px">&#xe63a;</b>
+                <span th:text="${cvo.replyCount}" style="font-size: 16px">100</span>
+              </span>
+                          <div th:if="${loginUser!=null and (loginUser.id==user.id || loginUser.type==1)}" class="jieda-admin">
+<!--                              <span type="edit">编辑</span>-->
+                              <span th:if="${cvo.comment.id!=post.acceptId}" type="del">删除</span>
+                              <span th:if="${post.type==0 and post.acceptId==0 and cvo.user.id!=user.id}" type="accept">
+                                  采纳</span>
+                          </div>
+                      </div>
+
+                      <!-- 回复列表 -->
+                      <div th:hidden="${cvo.replyCount>5?'true':'false'}" th:id="|replylist-${cvo.comment.id}|">
+                      <fieldset  class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                          <ul class="fly-list" style="background-color: #eeeeee; padding-left: 20px; padding-right: 20px;">
+
+                              <li th:each="rvo:${cvo.replys}" class="reply-li">
+                                  <div>
+										<span th:if="${rvo.target==null}">
+											<a th:href="@{|/user/profile/${rvo.user.id}|}"><b th:text="${rvo.user.username}">寒江雪</b></a>
+                                            <span th:if="${rvo.user.id==user.id}">(楼主)</span>
+                                            <span th:if="${rvo.user.id!=user.id and rvo.user.id==cvo.user.id}">(层主)</span>:
+										</span>
+                                      <span th:if="${rvo.target!=null}">
+
+											<a th:href="@{|/user/profile/${rvo.user.id}|}"><b  th:text="${rvo.user.username}">Sissi</b></a>
+                                              <span th:if="${rvo.user.id==user.id}">(楼主)</span>
+                                              <span th:if="${rvo.user.id!=user.id and rvo.user.id==cvo.user.id}">(层主)</span> 回复
+											<a th:href="@{|/user/profile/${rvo.target.id}|}"><b  th:text="${rvo.target.username}">寒江雪</b></a>
+                                              <span th:if="${rvo.target.id==user.id}">(楼主)</span>
+                                              <span th:if="${rvo.target.id!=user.id and rvo.target.id==cvo.user.id}">(层主)</span>:
+										</span>
+                                      <span th:utext="${rvo.reply.content}">这个是直播时间哈，觉得晚的话可以直接看之前的完整录播的~</span>
+                                  </div>
+                                  <div class="fly-list-info">
+                                      <span th:text="${#dates.format(rvo.reply.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</span>
+
+                                      <span class="fly-list-nums">
+                                          <a th:if="${loginUser!=null and (loginUser.id==cvo.user.id || loginUser.id==user.id || loginUser.type==1)}" href="javascript:;" th:onclick="|deleteReply(this,${rvo.reply.id});|" style="font-size: 12px">删除</a>
+                                          <a href="javascript:;" th:onclick="|like(this,2,${rvo.reply.id},${rvo.reply.userId},${post.id});|">
+                                              <i th:class="${rvo.likeStatus==1?'liked':''}" th:text="${rvo.likeStatus==1?'已赞':'赞'}" style="font-size: 12px">赞</i>
+                                              <span th:class="${rvo.likeStatus==1?'liked':''}" th:text="${rvo.likeCount}" style="font-size: 12px">1</span>
+                                          </a>
+
+                                      <a style="font-size: 12px">|</a>
+                                      <input type="hidden" th:id="|username-${rvo.reply.id}|" th:value="${rvo.user.username}">
+
+                                      <a href="javascript:;" th:onclick="|replyTarget(this,${cvo.comment.id},${rvo.reply.id});|" style="font-size: 12px">回复</a>
+                                    </span>
+
+                                  </div>
+                              </li>
+
+                              <!-- 回复输入框 -->
+                              <li>
+                                  <form class="layui-form" method="post" th:action="@{|/comment/add/${post.id}|}">
+                                      <input type="hidden" name="entityType" value="2">
+                                      <input type="hidden" name="entityId" th:value="${cvo.comment.id}">
+                                      <div class="layui-input-block" style="margin-left: 0px">
+                                          <a name="comment"></a>
+                                          <input th:id="|reply-${cvo.comment.id}|" name="content" lay-verify="required" autocomplete="off" class="layui-input">
+                                          <button style="position: absolute;top: 0;right: 0px;
+    cursor: pointer;" lay-submit lay-filter="*" class="layui-btn">回复</button>
+                                      </div>
+
+                                  </form>
+
+                              </li>
+
+
+                          </ul>
+                      </fieldset>
+                      </div>
+
+                  </li>
+
+
+
+                  <!-- 无数据时 -->
+                  <li th:if="${page.rows==0}" class="fly-none">消灭零回复</li>
+              </ul>
+              <div th:if="${not #lists.isEmpty(comments)}" id="pageDemo"></div>
+              <div class="layui-form layui-form-pane">
+                  <form class="layui-form" th:action="@{|/comment/add/${post.id}|}" method="post">
+                      <div class="layui-form-item layui-form-text">
+                          <a name="comment"></a>
+                          <div class="layui-input-block">
+                              <textarea id="L_content" name="content" required lay-verify="required" placeholder="请输入内容"  class="layui-textarea fly-editor" style="height: 150px;"></textarea>
+                          </div>
+                      </div>
+                      <div class="layui-form-item">
+                          <input type="hidden" name="entityType" value="1">
+                          <input type="hidden" name="entityId" th:value="${post.id}">
+                          <button class="layui-btn" lay-filter="*" lay-submit>提交回复</button>
+<!--                      <button class="layui-btn" lay-filter="*" lay-submit>提交回复</button>-->
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+
+
+    <div class="layui-col-md4" th:replace="index::right">
+        <div class="fly-panel">
+            <h3 class="fly-panel-title">为您推荐</h3>
+            <ul class="fly-panel-main fly-list-static">
+                <li th:each="map,mapStat:${discussPosts}" th:if="${mapStat.index<10} and ${mapStat.odd}">
+                    <a th:href="@{|/discuss/detail/${map.post.id}|}" th:utext="${map.post.title}">备战春招</a>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="fly-panel fly-signin">
+            <div class="fly-panel-title">
+                签到
+                <i class="fly-mid"></i>
+                <a href="javascript:;" class="fly-link" id="LAY_signinHelp">说明</a>
+
+                <span class="fly-signin-days">已连续签到<cite>16</cite>天</span>
+            </div>
+            <div class="fly-panel-main fly-signin-main">
+                <button class="layui-btn layui-btn-danger" id="LAY_signin">今日签到</button>
+                <span>可获得<cite>5</cite>钻石</span>
+
+                <!-- 已签到状态 -->
+                <!--
+                <button class="layui-btn layui-btn-disabled">今日已签到</button>
+                <span>获得了<cite>20</cite>飞吻</span>
+                -->
+            </div>
+        </div>
+
+        <div class="fly-panel fly-rank fly-rank-reply" id="LAY_replyRank">
+            <h3 class="fly-panel-title">技术大咖</h3>
+            <dl>
+                <!--<i class="layui-icon fly-loading">&#xe63d;</i>-->
+                <dd th:each="map:${hotUsers}">
+                    <a th:href="@{|/user/profile/${map.user.id}|}">
+                        <img th:src="${map.user.headerUrl}"><cite th:utext="${map.user.username}">贤心</cite>
+                        <i>获得<span th:utext="${map.user.likeCount}"></span>次赞</i>
+                    </a>
+                </dd>
+            </dl>
+        </div>
+
+
+      <div class="fly-panel">
+        <div class="fly-panel-title">
+          友情推荐
+        </div>
+        <div class="fly-panel-main">
+          <a href="" target="_blank" class="fly-zanzhu" style="background-color: #393D49;">Lucky社区</a>
+        </div>
+      </div>
+      
+      <div class="fly-panel fly-link">
+        <h3 class="fly-panel-title">参考链接</h3>
+        <dl class="fly-panel-main">
+          <dd><a href="http://www.github.com/LuckybugQ" target="_blank">Github</a><dd>
+          <dd><a href="https://spring.io/projects/spring-boot" target="_blank">SpringBoot</a><dd>
+          <dd><a href="http://www.layui.com/" target="_blank">LayUI</a><dd>
+            <dd><a href="http://kafka.apache.org/" target="_blank">Kafka</a><dd>
+            <dd><a href="https://www.elastic.co/cn/" target="_blank">Elasticsearch</a><dd>
+            <dd><a href="http://www.quartz-scheduler.org/" target="_blank">Quartz</a><dd>
+          <dd><a href="mailto:luckybugq@163.com?subject=%E7%94%B3%E8%AF%B7Fly%E7%A4%BE%E5%8C%BA%E5%8F%8B%E9%93%BE" class="fly-link">联系作者</a><dd>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="fly-footer" th:replace="index::footer">
+  <p><a href="http://www.luckybugq.xyz/" target="_blank">Lucky社区</a> 2020 &copy;
+      <a href="http://www.github.com/LuckybugQ" target="_blank">luckybugq 出品</a></p>
+  <p>
+    <a target="_blank">苏ICP备20004934号-1</a>
+  </p>
+</div>
+
+
+<script th:src="@{/res/layui/layui.js}"></script>
+<script>
+    layui.use(['layer', 'laypage', 'element'], function(){
+        var layer = layui.layer
+            ,laypage = layui.laypage
+        //测试数据
+        var rows = [[${page.rows}]];
+        var limit = [[${page.limit}]];
+        var current = [[${page.current}]];
+        var postid = [[${post.id}]]
+        //调用分页
+        laypage.render({
+            elem: 'pageDemo'
+            ,count: rows
+            ,curr:current
+            ,limit:limit
+            ,jump: function(obj , first){
+                //首次不执行
+                if(!first){
+                    //do something
+                    var pageSize=obj.limit;
+                    var pageNum=obj.curr;
+                    window.location.href="/discuss/detail/"+postid+"?current="+pageNum;//跳转链接
+                }
+
+            }
+        });
+    });
+</script>
+<script>
+    layui.cache.page = '';
+    layui.cache.user = {
+        username: '游客'
+        ,uid: -1
+        ,avatar: '../../res/images/avatar/00.jpg'
+        ,experience: 83
+        ,sex: '男'
+    };
+    layui.config({
+        version: "3.0.0"
+        ,base: '/res/mods/'
+    }).extend({
+        fly: 'index'
+    }).use(['fly', 'face'], function(){
+        var $ = layui.$
+            ,fly = layui.fly;
+        //如果你是采用模版自带的编辑器，你需要开启以下语句来解析。
+
+        $('.detail-body').each(function(){
+          var othis = $(this), html = othis.html();
+          othis.html(fly.content(html));
+        });
+
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<script th:src="@{/js/discuss.js}"></script>
+</body>
+</html>

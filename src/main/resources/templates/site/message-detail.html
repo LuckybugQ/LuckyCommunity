@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>Lucky社区-消息列表</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="keywords" content="社区">
+	<meta name="description" content="Lucky社区是以SpringBoot和LayUI开发的个人社区">
+	<link rel="stylesheet" th:href="@{/res/layui/css/layui.css}">
+	<link rel="stylesheet" th:href="@{/res/css/global.css}">
+	<link rel="icon" href="https://zzq-community-header.oss-cn-chengdu.aliyuncs.com/31ee644b54724b7c9df58e30ef14b616.png"/>
+</head>
+<body>
+
+<div class="fly-header layui-bg-black" th:replace="index::header">
+	<div class="layui-container">
+		<a class="fly-logo" href="/">
+			<img src="../../res/images/logo.png" alt="layui">
+		</a>
+		<ul class="layui-nav fly-nav layui-hide-xs">
+			<li class="layui-nav-item layui-this">
+				<a href="/"><i class="iconfont icon-jiaoliu"></i>交流</a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="../case/case.html"><i class="iconfont icon-iconmingxinganli"></i>案例</a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="http://www.layui.com/" target="_blank"><i class="iconfont icon-ui"></i>框架</a>
+			</li>
+		</ul>
+
+		<ul class="layui-nav fly-nav-user">
+
+			<!-- 未登入的状态 -->
+			<li class="layui-nav-item">
+				<a class="iconfont icon-touxiang layui-hide-xs" href="user/login.html"></a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="user/login.html">登入</a>
+			</li>
+			<li class="layui-nav-item">
+				<a href="user/reg.html">注册</a>
+			</li>
+			<li class="layui-nav-item layui-hide-xs">
+				<a href="/app/qq/" onclick="layer.msg('正在通过QQ登入', {icon:16, shade: 0.1, time:0})" title="QQ登入" class="iconfont icon-qq"></a>
+			</li>
+			<li class="layui-nav-item layui-hide-xs">
+				<a href="/app/weibo/" onclick="layer.msg('正在通过微博登入', {icon:16, shade: 0.1, time:0})" title="微博登入" class="iconfont icon-weibo"></a>
+			</li>
+
+			<!-- 登入后的状态 -->
+			<!--
+            <li class="layui-nav-item">
+              <a class="fly-nav-avatar" href="javascript:;">
+                <cite class="layui-hide-xs">贤心</cite>
+                <i class="iconfont icon-renzheng layui-hide-xs" title="认证信息：layui 作者"></i>
+                <i class="layui-badge fly-badge-vip layui-hide-xs">VIP3</i>
+                <img src="https://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+              </a>
+              <dl class="layui-nav-child">
+                <dd><a href="../user/set.html"><i class="layui-icon">&#xe620;</i>基本设置</a></dd>
+                <dd><a href="../user/message.html"><i class="iconfont icon-tongzhi" style="top: 4px;"></i>我的消息</a></dd>
+                <dd><a href="../user/home.html"><i class="layui-icon" style="margin-left: 2px; font-size: 22px;">&#xe68e;</i>我的主页</a></dd>
+                <hr style="margin: 5px 0;">
+                <dd><a href="" style="text-align: center;">退出</a></dd>
+              </dl>
+            </li>
+            -->
+		</ul>
+	</div>
+</div>
+
+<div class="layui-container fly-marginTop fly-user-main">
+	<ul class="layui-nav layui-nav-tree layui-inline" lay-filter="user">
+		<li class="layui-nav-item">
+			<a th:href="@{|/user/profile/${loginUser.id}|}">
+				<i class="layui-icon">&#xe609;</i>
+				我的主页
+			</a>
+		</li>
+		<li class="layui-nav-item">
+			<a th:href="@{/user/info}">
+				<i class="layui-icon">&#xe612;</i>
+				用户中心
+			</a>
+		</li>
+		<li class="layui-nav-item">
+			<a th:href="@{/user/setting}">
+				<i class="layui-icon">&#xe620;</i>
+				基本设置
+			</a>
+		</li>
+		<li class="layui-nav-item layui-this">
+			<a th:href="@{/user/message}">
+				<i class="layui-icon">&#xe611;</i>
+				我的消息<span th:if="${allUnreadCount>0}" class="layui-badge-dot"></span>
+			</a>
+		</li>
+	</ul>
+
+	<div class="site-tree-mobile layui-hide">
+		<i class="layui-icon">&#xe602;</i>
+	</div>
+	<div class="site-mobile-shade"></div>
+
+	<div class="site-tree-mobile layui-hide">
+		<i class="layui-icon">&#xe602;</i>
+	</div>
+	<div class="site-mobile-shade"></div>
+
+
+	<div class="fly-panel fly-panel-user" pad20>
+		<!--
+        <div class="fly-msg" style="margin-top: 15px;">
+          您的邮箱尚未验证，这比较影响您的帐号安全，<a href="activate.html">立即去激活？</a>
+        </div>
+        -->
+		<div class="layui-tab layui-tab-brief" lay-filter="user">
+			<ul class="layui-tab-title" id="LAY_mine">
+				<li th:text="|来自${target.username}的私信|" data-type="mine-jie" lay-id="1" class="layui-this">私信</li>
+				<input type="hidden" id="toName" name="toName" th:value="${target.username}">
+				<button style="position: absolute; right: 75px;" id="send-letter" class="layui-btn layui-btn-normal">发私信</button>
+				<button style="position: absolute; right: 0;" href="#" onclick="javascript:history.back(-1);" class="layui-btn">返回</button>
+			</ul>
+			<div class="layui-tab-content" style="padding: 20px 0;">
+				<div class="layui-tab-item layui-show">
+					<ul class="fly-list">
+						<li th:each="map:${letters}">
+							<a style="float:right" th:href="@{|/user/profile/${map.fromUser.id}|}" th:class="${loginUser.id==map.fromUser.id?'fly-avatar-right':'fly-avatar'}">
+								<img th:src="${map.fromUser.headerUrl}" alt="用户头像">
+							</a>
+							<div th:class="${loginUser.id==map.fromUser.id?'fly-list-h2-right':'fly-list-h2-left'}">
+								<i th:utext="${map.letter.content}"></i>
+							</div>
+
+							<div th:class="${loginUser.id==map.fromUser.id?'fly-list-info-right':'fly-list-info-left'}">
+								<span th:text="${#dates.format(map.letter.createTime,'yyyy-MM-dd HH:mm:ss')}">发帖时间</span>
+							</div>
+
+						</li>
+					</ul>
+					<div id="LAY_page"></div>
+				</div>
+			</div>
+			<div th:if="${page.rows==0}" class="fly-none">没有相关数据</div>
+			<div th:if="${page.rows>0}" id="pageDemo"></div>
+
+		</div>
+	</div>
+</div>
+
+<div class="fly-footer" th:replace="index::footer">
+</div>
+
+
+
+<script th:src="@{/res/layui/layui.js}"></script>
+
+<script>
+	layui.cache.page = '';
+	layui.cache.user = {
+		username: '游客'
+		,uid: -1
+		,avatar: '../res/images/avatar/00.jpg'
+		,experience: 83
+		,sex: '男'
+	};
+	layui.config({
+		version: "3.0.0"
+		,base: '/res/mods/'
+	}).extend({
+		fly: 'index'
+	}).use(['fly', 'face'], function(){
+		var $ = layui.$
+				,fly = layui.fly;
+		//如果你是采用模版自带的编辑器，你需要开启以下语句来解析。
+
+		$('.home-dacontent').each(function(){
+			var othis = $(this), html = othis.html();
+			othis.html(fly.content(html));
+		});
+
+	});
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<script>
+	layui.use(['layer', 'laypage', 'element'], function(){
+		var layer = layui.layer
+				,laypage = layui.laypage
+		//测试数据
+		var rows = [[${page.rows}]];
+		var current = [[${page.current}]];
+		var limit = [[${page.limit}]];
+		//调用分页
+		laypage.render({
+			elem: 'pageDemo'
+			,count: rows
+			,curr:current
+			,limit:limit
+			,jump: function(obj , first){
+				//首次不执行
+				if(!first){
+					//do something
+					var pageSize=obj.limit;
+					var pageNum=obj.curr;
+					var path = window.location.pathname;
+					window.location.href=path+"?current="+pageNum;//跳转链接
+				}
+
+			}
+		});
+	});
+</script>
+</body>
+</html>
